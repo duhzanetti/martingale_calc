@@ -1,4 +1,4 @@
-# Simulador de Martingale
+# Calculadora de Martingale
 
 Este é um simulador para operações de opções binárias utilizando a estratégia de Martingale. O objetivo da página é calcular as perdas e ganhos em uma série de entradas, levando em conta o saldo inicial, valor da entrada inicial, fator de multiplicação de Martingale e o payout. A tabela gerada exibe as informações de forma clara e facilita o acompanhamento do desempenho das operações.
 
