@@ -8,88 +8,88 @@
 
   <!-- Manifesto do PWA -->
   <link rel="manifest" href="manifest.json">
-    <style>
-        body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        h2 {
-            color: #cddc39;
-            text-align: center;
-        }
-        label {
-            color: #ffffff;
-            margin-right: 10px;
-        }
-        input {
-            background-color: #2c2c2c;
-            border: 1px solid #cddc39;
-            color: #ffffff;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 5px 0;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #cddc39;
-            color: #121212;
-            border: none;
-            padding: 15px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #afb42b;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #cddc39;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #1c1c1c;
-            color: #cddc39;
-        }
-        td {
-            background-color: #2c2c2c;
-        }
-        td:nth-child(odd) {
-            background-color: #212121;
-        }
-        tbody tr:hover {
-            background-color: #333333;
-        }
+  <style>
+      body {
+          background-color: #121212;
+          color: #e0e0e0;
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+      }
+      h2 {
+          color: #cddc39;
+          text-align: center;
+      }
+      label {
+          color: #ffffff;
+          margin-right: 10px;
+      }
+      input {
+          background-color: #2c2c2c;
+          border: 1px solid #cddc39;
+          color: #ffffff;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 5px 0;
+          width: 100%;
+          box-sizing: border-box;
+      }
+      button {
+          background-color: #cddc39;
+          color: #121212;
+          border: none;
+          padding: 15px 20px;
+          font-size: 16px;
+          border-radius: 5px;
+          cursor: pointer;
+          margin-top: 10px;
+          width: 100%;
+      }
+      button:hover {
+          background-color: #afb42b;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+      th, td {
+          border: 1px solid #cddc39;
+          padding: 10px;
+          text-align: center;
+      }
+      th {
+          background-color: #1c1c1c;
+          color: #cddc39;
+      }
+      td {
+          background-color: #2c2c2c;
+      }
+      td:nth-child(odd) {
+          background-color: #212121;
+      }
+      tbody tr:hover {
+          background-color: #333333;
+      }
 
-        /* Media Query para ajustar o layout em telas menores (modo mobile) */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            table, th, td {
-                font-size: 12px;
-                padding: 5px;
-            }
-            h2 {
-                font-size: 18px;
-            }
-            button {
-                padding: 10px;
-                font-size: 14px;
-            }
-        }
-    </style>
+      /* Media Query para ajustar o layout em telas menores (modo mobile) */
+      @media (max-width: 600px) {
+          body {
+              padding: 10px;
+          }
+          table, th, td {
+              font-size: 12px;
+              padding: 5px;
+          }
+          h2 {
+              font-size: 18px;
+          }
+          button {
+              padding: 10px;
+              font-size: 14px;
+          }
+      }
+  </style>
 </head>
 <body>
     <h2>Calculadora de Perca e Ganho - Martingale</h2>
@@ -107,6 +107,14 @@
     <input type="number" id="payout" placeholder="Ex: 80"><br><br>
 
     <button onclick="calcular()">Calcular</button>
+
+    <!-- Exibição do Martingale -->
+    <div id="melhorTaxa" style="text-align: left; margin-top: 20px; font-size: 18px;">
+		<span style="color: yellow;">Martingale:</span> <strong style="color: white;"></strong><br>
+		<span style="color: yellow;">Máximo de entradas possíveis:</span> <strong style="color: white;"></strong><br>
+		<span style="color: yellow;">Saldo necessário para próxima entrada:</span> <strong style="color: white;"></strong><br>
+		<span style="color: yellow;">Saldo total para próxima entrada:</span> <strong style="color: white;"></strong>
+	</div>
 
     <table id="resultado">
         <thead>
@@ -129,6 +137,12 @@
             const fator = parseFloat(document.getElementById("fator").value);
             const payout = parseFloat(document.getElementById("payout").value) / 100;
 
+            // Verifica se todos os campos necessários estão preenchidos
+            if (isNaN(saldoInicial) || isNaN(entradaInicial) || isNaN(fator) || isNaN(payout)) {
+                alert("Por favor, preencha todos os campos obrigatórios.");
+                return; // Sai da função se algum campo estiver vazio
+            }
+
             let tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = ""; // Limpa a tabela
 
@@ -136,12 +150,25 @@
             let valorEntrada = entradaInicial;
             let percaAcumulada = 0;
             let i = 1;
+            let entradasPositivas = 0;
+            let todasPositivas = true;
 
+            // Variável para calcular saldo necessário para mais uma entrada
+            let saldoNecessario = 0;
+
+            // Calcula o Martingale e popula a tabela
             while (saldoAtual > 0) {
                 let lucro = valorEntrada * payout;
                 let balanco = lucro - percaAcumulada;
                 percaAcumulada += valorEntrada;
                 let saldoNegativo = saldoAtual - valorEntrada;
+
+                // Verifica se o valor líquido ainda é positivo
+                if (balanco > 0) {
+                    entradasPositivas++;
+                } else {
+                    todasPositivas = false;
+                }
 
                 // Preencher a tabela
                 let row = `<tr>
@@ -159,15 +186,39 @@
                 valorEntrada *= fator;
                 i++;
 
-                // Se o saldo atual for menor que a próxima entrada, encerra o loop
-                if (saldoAtual <= valorEntrada) break;
+                // Se o saldo atual for menor que a próxima entrada, calcula o saldo necessário e encerra o loop
+                if (saldoAtual <= valorEntrada) {
+                    saldoNecessario = valorEntrada - saldoAtual;
+                    break;
+                }
+            }
+
+            // Exibe a quantidade de entradas com saldo líquido positivo ou "Positivo" com check
+            if (todasPositivas) {
+                document.querySelector("#melhorTaxa strong").innerHTML = `Positivo <span style="color: lime;">✓</span>`;
+            } else {
+                document.querySelector("#melhorTaxa strong").innerHTML = `Entradas com saldo líquido positivo: <strong style="color: lime;">${entradasPositivas}</strong>`;
+            }
+
+            // Calcula e exibe o máximo de entradas possíveis
+            let maxEntradas = i - 1;
+            document.querySelector("#melhorTaxa strong:nth-of-type(2)").innerHTML = `${maxEntradas}`;
+
+            // Exibe o saldo necessário para realizar mais uma entrada
+            if (saldoNecessario > 0) {
+                document.querySelector("#melhorTaxa strong:nth-of-type(3)").innerHTML = `R$ ${saldoNecessario.toFixed(2)}`;
+                
+                // Cálculo do saldo total para a próxima entrada
+                const saldoTotalParaProximaEntrada = saldoInicial + saldoNecessario; // Usando saldoInicial
+                document.querySelector("#melhorTaxa strong:nth-of-type(4)").innerHTML = `R$ ${saldoTotalParaProximaEntrada.toFixed(2)}`;
             }
         }
     </script>
-<footer style="text-align: center; margin-top: 20px;">
-    <a href="https://github.com/duhzanetti/martingale_calc" target="_blank">
-        <button style="background-color: #424242; color: #ffffff; padding: 10px 20px;">Projeto GitHub</button>
-    </a>
-</footer>
+
+    <footer style="text-align: center; margin-top: 20px;">
+        <a href="https://github.com/duhzanetti/martingale_calc" target="_blank">
+            <button style="background-color: #424242; color: #ffffff; padding: 10px 20px;">Projeto GitHub</button>
+        </a>
+    </footer>
 </body>
 </html>
